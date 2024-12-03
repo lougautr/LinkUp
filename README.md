@@ -59,7 +59,64 @@ Voici une liste des routes disponibles avec leurs méthodes, corps de requête e
 - Réponse attendue (200 OK)
 ```json
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI3Y2IwZWJiLWEyNjMtNDc0OC1iMDBkLWFmMzllYjQxYTc0NiIsImlhdCI6MTczMzIyMTQ1MiwiZXhwIjoxNzMzMzA3ODUyfQ.2t8hV6SENOp3BrEIVR0fih5mbAyId2NjMk45c7ifyiE"
+    "token": "<your_token>"
+}
+```
+
+### 3. Récupération des posts
+- Route : http://localhost:3000/posts/
+- Méthode : GET
+- Header :
+```json
+"authorization": "Bearer <your_token>"
+```
+
+- Réponse attendue (200 OK)
+```json
+[
+    {
+        "id": "<post_id>",
+        "userId": "<user_id>",
+        "content": "Voici un exemple de contenu pour le post.",
+        "mediaUrl": "https://example.com/media/image.png",
+        "createdAt": "2024-12-03T13:21:48.476Z",
+        "type": "post",
+        "_rid": "D1ZvANZednMCAAAAAAAAAA==",
+        "_self": "dbs/D1ZvAA==/colls/D1ZvANZednM=/docs/D1ZvANZednMCAAAAAAAAAA==/",
+        "_etag": "\"4a089080-0000-0e00-0000-674f05ed0000\"",
+        "_attachments": "attachments/",
+        "_ts": 1733232109
+    }
+]
+```
+
+### 4. Création d'un post
+- Route : http://localhost:3000/posts/
+- Méthode : POST
+- Header :
+```json
+"authorization": "Bearer <your_token>"
+```
+- Body : JSON
+```json
+{
+  "content": "Voici un exemple de contenu pour le post.",
+  "mediaUrl": "https://example.com/media/image.png"
+}
+```
+
+- Réponse attendue (201 Created)
+```json
+{
+    "message": "Post créé avec succès",
+    "post": {
+        "id": "<post_id>",
+        "userId": "<your_user_id>",
+        "content": "Voici un exemple de contenu pour le post.",
+        "mediaUrl": "https://example.com/media/image.png",
+        "createdAt": "2024-12-03T12:48:07.744Z",
+        "type": "post"
+    }
 }
 ```
 
