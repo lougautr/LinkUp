@@ -1,9 +1,14 @@
 module.exports = {
   cosmos: {
-    endpoint: "https://linkup-cosmosdb.documents.azure.com:443/",
-    key: "1qH4ubnR82wFA5SgvqVuJiWCjpOgfKGzSrKTYy0nzKG1zG1zCXtn5LjcYqIUYNhejRjofq1dDkZkACDb0IupAg==", // Votre clé primaire
-    databaseId: "LinkUpDB", // Correct
-    containerId: "Users", // Mettez à jour ici
+    endpoint: process.env.COSMOS_DB_ENDPOINT,
+    key: process.env.COSMOS_DB_KEY,
+    databaseId: process.env.COSMOS_DB_DATABASE_ID,
+    containerId: process.env.COSMOS_DB_CONTAINER_ID,
   },
-  jwtSecret: "VOTRE_CLE_SECRETE_JWT", // JWT secret
+  blob: {
+    accountName: process.env.BLOB_STORAGE_ACCOUNT_NAME,
+    accountKey: process.env.BLOB_STORAGE_ACCOUNT_KEY,
+    containerName: process.env.BLOB_STORAGE_CONTAINER_NAME,
+  },
+  jwtSecret: process.env.JWT_SECRET,
 };
