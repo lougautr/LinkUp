@@ -6,41 +6,65 @@ const {
   getPosts,
   getPostById,
 } = require("../controllers/postController");
-const { uploadFileToBlob } = require("../blobService");
 
 // Configuration de multer pour traiter les fichiers
 const upload = multer();
+const authMiddleware = require("../middleware/auth");
 
 /**
  * @swagger
  * /posts:
  *   post:
- *     summary: Création d’un post
+ *     summary: Création d’un post avec un fichier
  *     tags: [Posts]
  *     security:
  *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
  *               content:
  *                 type: string
+ *                 description: Le contenu du post
  *                 example: Voici un exemple de contenu pour le post.
- *               mediaUrl:
+ *               file:
  *                 type: string
- *                 example: https://example.com/media/image.png
+ *                 format: binary
+ *                 description: Le fichier à uploader
  *     responses:
  *       201:
  *         description: Post créé avec succès
- *       403:
- *         description: Non autorisé
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 post:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     content:
+ *                       type: string
+ *                     mediaUrl:
+ *                       type: string
+ *                       example: https://linkupstorage.blob.core.windows.net/uploads/example.jpg
+ *                     createdAt:
+ *                       type: string
+ *                       format: date-time
+ *                     userId:
+ *                       type: string
+ *       400:
+ *         description: Données invalides ou fichier manquant
  *       500:
- *         description: Erreur serveur
+ *         description: Erreur lors de la création du post
  */
-router.post("/", createPost);
+router.post("/", authMiddleware, upload.single("file"), createPost);
 
 /**
  * @swagger
@@ -58,7 +82,7 @@ router.post("/", createPost);
  *       500:
  *         description: Erreur serveur
  */
-router.get("/", getPosts);
+router.get("/", authMiddleware, getPosts);
 
 /**
  * @swagger
@@ -85,63 +109,6 @@ router.get("/", getPosts);
  *       500:
  *         description: Erreur serveur
  */
-router.get("/:id", getPostById);
-
-/**
- * @swagger
- * /posts/upload:
- *   post:
- *     summary: Upload d’un fichier pour un post
- *     tags: [Posts]
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               file:
- *                 type: string
- *                 format: binary
- *                 description: Le fichier à uploader
- *     responses:
- *       200:
- *         description: Fichier uploadé avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 fileUrl:
- *                   type: string
- *                   example: https://linkupstorage.blob.core.windows.net/uploads/example.jpg
- *       400:
- *         description: Aucun fichier envoyé
- *       500:
- *         description: Erreur lors de l'upload
- */
-router.post("/upload", upload.single("file"), async (req, res) => {
-  try {
-    const file = req.file;
-    if (!file) {
-      return res.status(400).json({ message: "Aucun fichier envoyé." });
-    }
-
-    // Upload du fichier vers Azure Blob Storage
-    const fileUrl = await uploadFileToBlob(file.originalname, file.buffer);
-
-    res.status(200).json({
-      message: "Fichier uploadé avec succès.",
-      fileUrl,
-    });
-  } catch (err) {
-    console.error("Erreur lors de l'upload :", err.message);
-    res.status(500).json({ message: "Erreur lors de l'upload du fichier." });
-  }
-});
+router.get("/:id", authMiddleware, getPostById);
 
 module.exports = router;

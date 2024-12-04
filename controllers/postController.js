@@ -1,10 +1,24 @@
 const { posts: postContainer, users: userContainer } = require("../cosmosClient");
 const { v4: uuidv4 } = require("uuid");
+const { uploadFileToBlob } = require("../blobService"); // Importer la fonction
 
 exports.createPost = async (req, res) => {
-  const { content, mediaUrl } = req.body;
+  Object.keys(req.body).forEach((key) => {
+    req.body[key.trim()] = req.body[key];
+    delete req.body[key];
+  });
+
+  const { content } = req.body;
+  
+  const file = req.file; 
 
   try {
+    let mediaUrl = null;
+    if (file) {
+      mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
+    }
+
+    // Étape 2 : Création du post
     const post = {
       id: uuidv4(),
       userId: req.userId,
@@ -17,6 +31,7 @@ exports.createPost = async (req, res) => {
     await postContainer.items.create(post);
     res.status(201).json({ message: "Post créé avec succès", post });
   } catch (error) {
+    console.error("Erreur lors de la création du post :", error.message);
     res.status(500).json({ error: error.message });
   }
 };
