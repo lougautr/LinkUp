@@ -10,8 +10,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net",
-        description: "Serveur local",
+        url: "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net",
+        description: "Serveur de production",
       },
     ],
     components: {
