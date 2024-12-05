@@ -118,12 +118,15 @@ exports.getPostById = async (req, res) => {
       .fetchAll();
 
     const user = users[0];
-
-    if (user && user.isPrivate === false) {
-      return res.json(post); // Return the post if the user is public
+    if (user.id === req.userId) {
+      return res.json(post);
     }
-
-    return res.status(403).json({ error: "Access to post denied" });
+    else if (user && user.isPrivate === false) {
+      return res.json(post);
+    }
+    else{
+      return res.status(403).json({ error: "Access to post denied" });
+    }
   } catch (error) {
     console.error(
       `Error fetching post ${id}:`,
