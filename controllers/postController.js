@@ -1,13 +1,20 @@
-const { posts: postContainer, users: userContainer } = require("../cosmosClient");
+const {
+  posts: postContainer,
+  users: userContainer,
+} = require("../cosmosClient");
 const { v4: uuidv4 } = require("uuid");
 const { uploadFileToBlob } = require("../blobService"); // Importer la fonction
 
 exports.createPost = async (req, res) => {
+  const cleanedBody = {};
+  Object.keys(req.body).forEach((key) => {
+    cleanedBody[key.trim()] = req.body[key];
+  });
+  req.body = cleanedBody;
 
-  const body = Object.assign({}, req.body);
-  const { content } = body;
-  
-  const file = req.file; 
+  const { content } = req.body;
+
+  const file = req.file;
 
   try {
     let mediaUrl = null;
@@ -59,7 +66,10 @@ exports.getPosts = async (req, res) => {
             return post; // Inclure le post si l'utilisateur est public
           }
         } catch (error) {
-          console.error(`Erreur lors de la récupération de l'utilisateur pour le post ${post.id}:`, error.message);
+          console.error(
+            `Erreur lors de la récupération de l'utilisateur pour le post ${post.id}:`,
+            error.message
+          );
         }
 
         return null; // Si l'utilisateur n'est pas public ou une erreur survient
@@ -109,11 +119,13 @@ exports.getPostById = async (req, res) => {
 
     return res.status(403).json({ error: "Accès refusé au post" });
   } catch (error) {
-    console.error(`Erreur lors de la récupération du post ${id}:`, error.message);
+    console.error(
+      `Erreur lors de la récupération du post ${id}:`,
+      error.message
+    );
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.updatePost = async (req, res) => {
   const { id } = req.params;
@@ -137,7 +149,9 @@ exports.updatePost = async (req, res) => {
 
     // Ensure the post belongs to the user making the request
     if (post.userId !== req.userId) {
-      return res.status(403).json({ error: "Unauthorized to update this post" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to update this post" });
     }
 
     // Update media if a new file is uploaded
@@ -157,7 +171,9 @@ exports.updatePost = async (req, res) => {
     // Replace the post in the database
     await postContainer.item(post.id, post.userId).replace(updatedPost);
 
-    res.status(200).json({ message: "Post updated successfully", post: updatedPost });
+    res
+      .status(200)
+      .json({ message: "Post updated successfully", post: updatedPost });
   } catch (error) {
     console.error(`Error updating post ${id}:`, error.message);
     res.status(500).json({ error: error.message });
@@ -184,7 +200,9 @@ exports.deletePost = async (req, res) => {
 
     // Ensure the post belongs to the user making the request
     if (post.userId !== req.userId) {
-      return res.status(403).json({ error: "Unauthorized to delete this post" });
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this post" });
     }
 
     // Delete the post
