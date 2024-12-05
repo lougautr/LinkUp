@@ -1,5 +1,11 @@
 # Projet Azure : LinkUp
 
+## Auteurs
+
+- Antonin Montagne
+- Lou-Anne Gautherie
+- Mathieu Goudal
+
 ## Objectif du projet
 
 Le projet LinkUp est une application web utilisant Azure Cosmos DB pour gérer les utilisateurs et les posts. L’objectif est de permettre l’inscription, la connexion et la gestion des données via une API REST construite avec Node.js et Express.
