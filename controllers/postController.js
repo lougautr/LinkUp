@@ -3,7 +3,7 @@ const {
   users: userContainer,
 } = require("../cosmosClient");
 const { v4: uuidv4 } = require("uuid");
-const { uploadFileToBlob } = require("../blobService"); // Importer la fonction
+const { uploadFileToBlob } = require("../blobService"); // Import the function
 
 exports.createPost = async (req, res) => {
   const cleanedBody = {};
@@ -22,7 +22,7 @@ exports.createPost = async (req, res) => {
       mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
     }
 
-    // Étape 2 : Création du post
+    // Step 2: Create the post
     const post = {
       id: uuidv4(),
       userId: req.userId,
@@ -33,25 +33,25 @@ exports.createPost = async (req, res) => {
     };
 
     await postContainer.items.create(post);
-    res.status(201).json({ message: "Post créé avec succès", post });
+    res.status(201).json({ message: "Post created successfully", post });
   } catch (error) {
-    console.error("Erreur lors de la création du post :", error.message);
+    console.error("Error creating post:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
 
 exports.getPosts = async (req, res) => {
   try {
-    // Récupérer tous les posts
+    // Fetch all posts
     const { resources: posts } = await postContainer.items
       .query("SELECT * FROM c WHERE c.type = 'post'")
       .fetchAll();
 
-    // Vérifier le profil de chaque utilisateur associé aux posts
+    // Check each user's profile associated with the posts
     const visiblePosts = await Promise.all(
       posts.map(async (post) => {
         try {
-          // Ajouter le second paramètre pour la clé de partition
+          // Add the second parameter for partition key
           const { resources: users } = await userContainer.items
             .query({
               query: "SELECT * FROM c WHERE c.id = @userId",
@@ -61,22 +61,22 @@ exports.getPosts = async (req, res) => {
 
           const user = users[0];
 
-          // Vérifiez si l'utilisateur a été trouvé et si le profil est public
+          // Check if the user is found and if the profile is public
           if (user && user.isPrivate === false) {
-            return post; // Inclure le post si l'utilisateur est public
+            return post; // Include the post if the user is public
           }
         } catch (error) {
           console.error(
-            `Erreur lors de la récupération de l'utilisateur pour le post ${post.id}:`,
+            `Error fetching user for post ${post.id}:`,
             error.message
           );
         }
 
-        return null; // Si l'utilisateur n'est pas public ou une erreur survient
+        return null; // If the user is private or an error occurs
       })
     );
 
-    // Filtrer les posts visibles (supprimer les `null`)
+    // Filter visible posts (remove nulls)
     const filteredPosts = visiblePosts.filter((post) => post !== null);
 
     res.json(filteredPosts);
@@ -89,7 +89,7 @@ exports.getPostById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Requête SQL pour récupérer le post avec l'ID et la clé de partition userId
+    // SQL query to fetch the post by ID and partition key userId
     const { resources: posts } = await postContainer.items
       .query({
         query: "SELECT * FROM c WHERE c.id = @id",
@@ -100,10 +100,10 @@ exports.getPostById = async (req, res) => {
     const post = posts[0];
 
     if (!post || post.type !== "post") {
-      return res.status(404).json({ error: "Post non trouvé" });
+      return res.status(404).json({ error: "Post not found" });
     }
 
-    // Requête pour vérifier si l'utilisateur associé est public
+    // Query to check if the associated user is public
     const { resources: users } = await userContainer.items
       .query({
         query: "SELECT * FROM c WHERE c.id = @userId",
@@ -114,13 +114,13 @@ exports.getPostById = async (req, res) => {
     const user = users[0];
 
     if (user && user.isPrivate === false) {
-      return res.json(post); // Retourner le post si l'utilisateur est public
+      return res.json(post); // Return the post if the user is public
     }
 
-    return res.status(403).json({ error: "Accès refusé au post" });
+    return res.status(403).json({ error: "Access to post denied" });
   } catch (error) {
     console.error(
-      `Erreur lors de la récupération du post ${id}:`,
+      `Error fetching post ${id}:`,
       error.message
     );
     res.status(500).json({ error: error.message });
@@ -135,18 +135,18 @@ exports.updatePost = async (req, res) => {
   req.body = cleanedBody;
 
   const { content } = req.body;
-  const file = req.file; // Récupération du fichier envoyé
+  const file = req.file; // Get the uploaded file
 
   try {
     let mediaUrl = null;
     if (file) {
-      // Si un fichier est présent, on l'upload
+      // If a file is present, upload it
       mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
     }
 
     const postId = req.params.id;
 
-    // Recherche du post existant
+    // Find the existing post
     const { resources: posts } = await postContainer.items
       .query({
         query: "SELECT * FROM c WHERE c.id = @id",
@@ -156,25 +156,30 @@ exports.updatePost = async (req, res) => {
 
     const existingPost = posts[0];
 
-    // Vérification si le post existe et est du bon type
+    // Check if the post exists and is of type "post"
     if (!existingPost || existingPost.type !== "post") {
-      return res.status(404).json({ error: "Post non trouvé" });
+      return res.status(404).json({ error: "Post not found" });
     }
 
-    // Mise à jour des champs avec les nouvelles valeurs ou les anciennes
+    // Check if the user is authorized to update the post
+    if (existingPost.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized to modify this post" });
+    }
+
+    // Update the fields with new or old values
     const updatedPost = {
       ...existingPost,
-      content: content || existingPost.content, // Si le contenu est fourni, on le met à jour, sinon on garde l'ancien
-      mediaUrl: mediaUrl || existingPost.mediaUrl, // Si un fichier a été uploadé, on met à jour l'URL du fichier
-      updatedAt: new Date().toISOString(), // Met à jour la date de modification
+      content: content || existingPost.content, // If content is provided, update it; otherwise, keep the old
+      mediaUrl: mediaUrl || existingPost.mediaUrl, // If a file is uploaded, update the media URL
+      updatedAt: new Date().toISOString(), // Update the modified date
     };
 
-    // Mise à jour dans la base de données
+    // Update in the database
     await postContainer.item(postId, existingPost.userId).replace(updatedPost);
 
-    res.status(200).json({ message: "Post mis à jour avec succès", updatedPost });
+    res.status(200).json({ message: "Post updated successfully", updatedPost });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du post :", error.message);
+    console.error("Error updating post:", error.message);
     res.status(500).json({ error: error.message });
   }
 };
@@ -210,6 +215,24 @@ exports.deletePost = async (req, res) => {
     res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
     console.error(`Error deleting post ${id}:`, error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getPostsByUser = async (req, res) => {
+  console.log(req);
+  try {
+    const { resources: posts } = await postContainer.items
+      .query({
+        query: "SELECT * FROM c WHERE c.type = 'post' AND c.userId = @userId",
+        parameters: [{ name: "@userId", value: req.userId }],
+      })
+      .fetchAll();
+
+    console.log(posts);
+
+    res.json(posts);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };

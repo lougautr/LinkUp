@@ -6,6 +6,8 @@ const {
   getPosts,
   getPostById,
   updatePost,
+  deletePost,
+  getPostsByUser,
 } = require("../controllers/postController");
 
 // Configuration de multer pour traiter les fichiers
@@ -16,7 +18,7 @@ const authMiddleware = require("../middleware/auth");
  * @swagger
  * /posts:
  *   post:
- *     summary: Création d’un post avec un fichier
+ *     summary: Create a new post with a file
  *     tags: [Posts]
  *     security:
  *       - BearerAuth: []
@@ -29,15 +31,15 @@ const authMiddleware = require("../middleware/auth");
  *             properties:
  *               content:
  *                 type: string
- *                 description: Le contenu du post
- *                 example: Voici un exemple de contenu pour le post.
+ *                 description: The content of the post
+ *                 example: This is an example content for the post.
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: Le fichier à uploader
+ *                 description: The file to upload
  *     responses:
  *       201:
- *         description: Post créé avec succès
+ *         description: Post created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -61,9 +63,9 @@ const authMiddleware = require("../middleware/auth");
  *                     userId:
  *                       type: string
  *       400:
- *         description: Données invalides ou fichier manquant
+ *         description: Invalid data or missing file
  *       500:
- *         description: Erreur lors de la création du post
+ *         description: Error creating the post
  */
 router.post("/", authMiddleware, upload.single("file"), createPost);
 
@@ -71,25 +73,62 @@ router.post("/", authMiddleware, upload.single("file"), createPost);
  * @swagger
  * /posts:
  *   get:
- *     summary: Récupération de tous les posts visibles
+ *     summary: Retrieve all visible posts
  *     tags: [Posts]
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Liste des posts visibles
+ *         description: List of visible posts
  *       403:
- *         description: Non autorisé
+ *         description: Unauthorized
  *       500:
- *         description: Erreur serveur
+ *         description: Server error
  */
 router.get("/", authMiddleware, getPosts);
 
 /**
  * @swagger
+ * /posts/me:
+ *   get:
+ *     summary: Retrieve all posts of the currently logged-in user
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of posts of the currently logged-in user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   mediaUrl:
+ *                     type: string
+ *                     example: https://linkupstorage.blob.core.windows.net/uploads/example.jpg
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                   userId:
+ *                     type: string
+ *       403:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get("/me", authMiddleware, getPostsByUser);
+
+/**
+ * @swagger
  * /posts/{id}:
  *   get:
- *     summary: Récupération d’un post spécifique
+ *     summary: Retrieve a specific post by ID
  *     tags: [Posts]
  *     security:
  *       - BearerAuth: []
@@ -99,16 +138,16 @@ router.get("/", authMiddleware, getPosts);
  *         required: true
  *         schema:
  *           type: string
- *         description: ID du post à récupérer
+ *         description: ID of the post to retrieve
  *     responses:
  *       200:
- *         description: Détails du post récupéré
+ *         description: Post details retrieved successfully
  *       403:
- *         description: Accès refusé
+ *         description: Access denied
  *       404:
- *         description: Post non trouvé
+ *         description: Post not found
  *       500:
- *         description: Erreur serveur
+ *         description: Server error
  */
 router.get("/:id", authMiddleware, getPostById);
 
@@ -116,7 +155,7 @@ router.get("/:id", authMiddleware, getPostById);
  * @swagger
  * /posts/{id}:
  *   patch:
- *     summary: Mise à jour d’un post spécifique
+ *     summary: Update a specific post by ID
  *     tags: [Posts]
  *     security:
  *       - BearerAuth: []
@@ -126,7 +165,7 @@ router.get("/:id", authMiddleware, getPostById);
  *         required: true
  *         schema:
  *           type: string
- *         description: ID du post à mettre à jour
+ *         description: ID of the post to update
  *     requestBody:
  *       required: true
  *       content:
@@ -136,18 +175,45 @@ router.get("/:id", authMiddleware, getPostById);
  *             properties:
  *               content:
  *                 type: string
- *                 description: Le contenu du post
- *                 example: Voici un exemple de contenu pour le post.
+ *                 description: The content of the post
+ *                 example: This is an updated content for the post.
  *     responses:
  *       200:
- *         description: Post mis à jour avec succès
+ *         description: Post updated successfully
  *       403:
- *         description: Accès refusé
+ *         description: Access denied
  *       404:
- *         description: Post non trouvé
+ *         description: Post not found
  *       500:
- *         description: Erreur serveur
+ *         description: Server error
  */
 router.patch("/:id", authMiddleware, upload.single("file"), updatePost);
+
+/**
+ * @swagger
+ * /posts/{id}:
+ *   delete:
+ *     summary: Delete a specific post by ID
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the post to delete
+ *     responses:
+ *       204:
+ *         description: Post deleted successfully
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Server error
+ */
+router.delete("/:id", authMiddleware, deletePost);
 
 module.exports = router;
