@@ -6,7 +6,7 @@ const { register, login } = require("../controllers/userController");
  * @swagger
  * /users/register:
  *   post:
- *     summary: Inscription d’un utilisateur
+ *     summary: User registration
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -26,9 +26,9 @@ const { register, login } = require("../controllers/userController");
  *                 example: false
  *     responses:
  *       201:
- *         description: Utilisateur créé avec succès
+ *         description: User successfully created
  *       500:
- *         description: Erreur serveur
+ *         description: Server error
  */
 router.post("/register", register);
 
@@ -36,7 +36,7 @@ router.post("/register", register);
  * @swagger
  * /users/login:
  *   post:
- *     summary: Connexion d’un utilisateur
+ *     summary: User login
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -53,11 +53,11 @@ router.post("/register", register);
  *                 example: password123
  *     responses:
  *       200:
- *         description: Connexion réussie, retourne le token JWT
+ *         description: Login successful, returns JWT token
  *       401:
- *         description: Identifiants invalides
+ *         description: Invalid credentials
  *       500:
- *         description: Erreur serveur
+ *         description: Server error
  */
 router.post("/login", login);
 
