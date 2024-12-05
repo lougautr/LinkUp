@@ -62,7 +62,7 @@ https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/api-docs
 
 L'API peut être testé :
 1. Avec `Swagger` sur les urls `"/api-docs"`
-2. Sur `Postman` en important notre collection `LinkUp.postman_collection.json`.
+2. Sur `Postman` en important notre collection `LinkUp.postman_collection.json` disponible à la racine du projet.
 
 ## Notes importantes
 - JWT : Les routes protégées nécessitent un token JWT valide. Celui-ci doit être inclus dans les headers sous la forme :
