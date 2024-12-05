@@ -10,7 +10,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: "linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net",
         description: "Serveur local",
       },
     ],
