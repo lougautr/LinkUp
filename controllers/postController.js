@@ -3,11 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const { uploadFileToBlob } = require("../blobService"); // Importer la fonction
 
 exports.createPost = async (req, res) => {
-  Object.keys(req.body).forEach((key) => {
-    req.body[key.trim()] = req.body[key];
-    delete req.body[key];
-  });
-
+ 
   const { content } = req.body;
   
   const file = req.file; 
@@ -120,21 +116,49 @@ exports.getPostById = async (req, res) => {
 
 exports.updatePost = async (req, res) => {
   const { id } = req.params;
-  const { content, mediaUrl } = req.body;
+  const { content } = req.body;
+  const file = req.file;
 
   try {
-    const { resource } = await postContainer.item(id, id).read();
+    // Fetch the post by ID
+    const { resources: posts } = await postContainer.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
 
-    if (resource.userId !== req.userId) {
-      return res.status(403).json({ error: "Accès refusé" });
+    const post = posts[0];
+
+    if (!post || post.type !== "post") {
+      return res.status(404).json({ error: "Post not found" });
     }
 
-    resource.content = content || resource.content;
-    resource.mediaUrl = mediaUrl || resource.mediaUrl;
+    // Ensure the post belongs to the user making the request
+    if (post.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized to update this post" });
+    }
 
-    await postContainer.item(id, id).replace(resource);
-    res.json({ message: "Post mis à jour", post: resource });
+    // Update media if a new file is uploaded
+    let mediaUrl = post.mediaUrl;
+    if (file) {
+      mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
+    }
+
+    // Update content and media URL
+    const updatedPost = {
+      ...post,
+      content: content || post.content,
+      mediaUrl,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Replace the post in the database
+    await postContainer.item(post.id, post.userId).replace(updatedPost);
+
+    res.status(200).json({ message: "Post updated successfully", post: updatedPost });
   } catch (error) {
+    console.error(`Error updating post ${id}:`, error.message);
     res.status(500).json({ error: error.message });
   }
 };
@@ -143,15 +167,31 @@ exports.deletePost = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const { resource } = await postContainer.item(id, id).read();
+    // Fetch the post by ID
+    const { resources: posts } = await postContainer.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: id }],
+      })
+      .fetchAll();
 
-    if (resource.userId !== req.userId) {
-      return res.status(403).json({ error: "Accès refusé" });
+    const post = posts[0];
+
+    if (!post || post.type !== "post") {
+      return res.status(404).json({ error: "Post not found" });
     }
 
-    await postContainer.item(id, id).delete();
-    res.json({ message: "Post supprimé" });
+    // Ensure the post belongs to the user making the request
+    if (post.userId !== req.userId) {
+      return res.status(403).json({ error: "Unauthorized to delete this post" });
+    }
+
+    // Delete the post
+    await postContainer.item(post.id, post.userId).delete();
+
+    res.status(200).json({ message: "Post deleted successfully" });
   } catch (error) {
+    console.error(`Error deleting post ${id}:`, error.message);
     res.status(500).json({ error: error.message });
   }
 };
