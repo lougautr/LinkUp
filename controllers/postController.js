@@ -3,8 +3,9 @@ const { v4: uuidv4 } = require("uuid");
 const { uploadFileToBlob } = require("../blobService"); // Importer la fonction
 
 exports.createPost = async (req, res) => {
- 
-  const { content } = req.body;
+
+  const body = Object.assign({}, req.body);
+  const { content } = body;
   
   const file = req.file; 
 
