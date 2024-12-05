@@ -3,7 +3,7 @@ const {
   users: userContainer,
 } = require("../cosmosClient");
 const { v4: uuidv4 } = require("uuid");
-const { uploadFileToBlob } = require("../blobService"); // Import the function
+const { uploadFileToBlob } = require("../blobService");
 
 exports.createPost = async (req, res) => {
   const cleanedBody = {};
@@ -22,7 +22,6 @@ exports.createPost = async (req, res) => {
       mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
     }
 
-    // Step 2: Create the post
     const post = {
       id: uuidv4(),
       userId: req.userId,
@@ -63,13 +62,13 @@ exports.getPosts = async (req, res) => {
 
           // Check if the user is found and if the profile is public
           if (user && user.isPrivate === false) {
-            return post; // Include the post if the user is public
+            return post;
           }
           else if (user.id === req.userId) {
-            return post; // Include the post if the user is the same as the requester
+            return post;
           }
           else {
-            return null; // Exclude the post if the user is private
+            return null;
           }
         } catch (error) {
           console.error(
@@ -78,7 +77,7 @@ exports.getPosts = async (req, res) => {
           );
         }
 
-        return null; // If the user is private or an error occurs
+        return null;
       })
     );
 
@@ -144,7 +143,7 @@ exports.updatePost = async (req, res) => {
   req.body = cleanedBody;
 
   const { content } = req.body;
-  const file = req.file; // Get the uploaded file
+  const file = req.file;
 
   try {
     let mediaUrl = null;
@@ -178,9 +177,9 @@ exports.updatePost = async (req, res) => {
     // Update the fields with new or old values
     const updatedPost = {
       ...existingPost,
-      content: content || existingPost.content, // If content is provided, update it; otherwise, keep the old
-      mediaUrl: mediaUrl || existingPost.mediaUrl, // If a file is uploaded, update the media URL
-      updatedAt: new Date().toISOString(), // Update the modified date
+      content: content || existingPost.content,
+      mediaUrl: mediaUrl || existingPost.mediaUrl, 
+      updatedAt: new Date().toISOString(),
     };
 
     // Update in the database

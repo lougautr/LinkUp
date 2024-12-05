@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
       type: "user",
     };
 
-    await userContainer.items.create(user); // Utilisation du conteneur Users
+    await userContainer.items.create(user);
     res.status(201).json({ message: "Utilisateur créé avec succès" });
   } catch (error) {
     res.status(500).json({ error: error.message });
