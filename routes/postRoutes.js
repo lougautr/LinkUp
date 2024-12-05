@@ -5,6 +5,7 @@ const {
   createPost,
   getPosts,
   getPostById,
+  updatePost,
 } = require("../controllers/postController");
 
 // Configuration de multer pour traiter les fichiers
@@ -110,5 +111,43 @@ router.get("/", authMiddleware, getPosts);
  *         description: Erreur serveur
  */
 router.get("/:id", authMiddleware, getPostById);
+
+/**
+ * @swagger
+ * /posts/{id}:
+ *   patch:
+ *     summary: Mise à jour d’un post spécifique
+ *     tags: [Posts]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID du post à mettre à jour
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: Le contenu du post
+ *                 example: Voici un exemple de contenu pour le post.
+ *     responses:
+ *       200:
+ *         description: Post mis à jour avec succès
+ *       403:
+ *         description: Accès refusé
+ *       404:
+ *         description: Post non trouvé
+ *       500:
+ *         description: Erreur serveur
+ */
+router.patch("/:id", authMiddleware, upload.single("file"), updatePost);
 
 module.exports = router;

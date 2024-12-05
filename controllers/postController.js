@@ -128,54 +128,53 @@ exports.getPostById = async (req, res) => {
 };
 
 exports.updatePost = async (req, res) => {
-  const { id } = req.params;
+  const cleanedBody = {};
+  Object.keys(req.body).forEach((key) => {
+    cleanedBody[key.trim()] = req.body[key];
+  });
+  req.body = cleanedBody;
+
   const { content } = req.body;
-  const file = req.file;
+  const file = req.file; // Récupération du fichier envoyé
 
   try {
-    // Fetch the post by ID
-    const { resources: posts } = await postContainer.items
-      .query({
-        query: "SELECT * FROM c WHERE c.id = @id",
-        parameters: [{ name: "@id", value: id }],
-      })
-      .fetchAll();
-
-    const post = posts[0];
-
-    if (!post || post.type !== "post") {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    // Ensure the post belongs to the user making the request
-    if (post.userId !== req.userId) {
-      return res
-        .status(403)
-        .json({ error: "Unauthorized to update this post" });
-    }
-
-    // Update media if a new file is uploaded
-    let mediaUrl = post.mediaUrl;
+    let mediaUrl = null;
     if (file) {
+      // Si un fichier est présent, on l'upload
       mediaUrl = await uploadFileToBlob(file.originalname, file.buffer);
     }
 
-    // Update content and media URL
+    const postId = req.params.id;
+
+    // Recherche du post existant
+    const { resources: posts } = await postContainer.items
+      .query({
+        query: "SELECT * FROM c WHERE c.id = @id",
+        parameters: [{ name: "@id", value: postId }],
+      })
+      .fetchAll();
+
+    const existingPost = posts[0];
+
+    // Vérification si le post existe et est du bon type
+    if (!existingPost || existingPost.type !== "post") {
+      return res.status(404).json({ error: "Post non trouvé" });
+    }
+
+    // Mise à jour des champs avec les nouvelles valeurs ou les anciennes
     const updatedPost = {
-      ...post,
-      content: content || post.content,
-      mediaUrl,
-      updatedAt: new Date().toISOString(),
+      ...existingPost,
+      content: content || existingPost.content, // Si le contenu est fourni, on le met à jour, sinon on garde l'ancien
+      mediaUrl: mediaUrl || existingPost.mediaUrl, // Si un fichier a été uploadé, on met à jour l'URL du fichier
+      updatedAt: new Date().toISOString(), // Met à jour la date de modification
     };
 
-    // Replace the post in the database
-    await postContainer.item(post.id, post.userId).replace(updatedPost);
+    // Mise à jour dans la base de données
+    await postContainer.item(postId, existingPost.userId).replace(updatedPost);
 
-    res
-      .status(200)
-      .json({ message: "Post updated successfully", post: updatedPost });
+    res.status(200).json({ message: "Post mis à jour avec succès", updatedPost });
   } catch (error) {
-    console.error(`Error updating post ${id}:`, error.message);
+    console.error("Erreur lors de la mise à jour du post :", error.message);
     res.status(500).json({ error: error.message });
   }
 };
