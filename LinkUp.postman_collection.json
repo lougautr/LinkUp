@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "86e9eb60-710f-4724-9fc3-295ed6a47e95",
+		"name": "LinkUp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31173762"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"\",\r\n  \"password\": \"\",\r\n  \"isPrivate\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/users/register",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \r\n    \"username\": \"\",\r\n    \"password\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/users/login",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get Posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts/",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Posts By Me",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts/me",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts/",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Modif Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "content",
+								"value": "tyqt",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts/",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/posts/",
+							"protocol": "https",
+							"host": [
+								"linkuplma-awd7bve4amarhdcn",
+								"westeurope-01",
+								"azurewebsites",
+								"net"
+							],
+							"path": [
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
