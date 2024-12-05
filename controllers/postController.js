@@ -65,6 +65,12 @@ exports.getPosts = async (req, res) => {
           if (user && user.isPrivate === false) {
             return post; // Include the post if the user is public
           }
+          else if (user.id === req.userId) {
+            return post; // Include the post if the user is the same as the requester
+          }
+          else {
+            return null; // Exclude the post if the user is private
+          }
         } catch (error) {
           console.error(
             `Error fetching user for post ${post.id}:`,
