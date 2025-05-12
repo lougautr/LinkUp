@@ -1,79 +1,78 @@
-# Projet Azure : LinkUp
+# LinkUp - An Azure project
 
-## Auteurs
+## Project objective
 
-- Antonin Montagne
-- Lou-Anne Gautherie
-- Mathieu Goudal
+The LinkUp project is a web application using Azure Cosmos DB to manage users and posts. The goal is to enable registration, login, and data management via a REST API built with Node.js and Express.
 
-## Objectif du projet
+## Prerequisites
 
-Le projet LinkUp est une application web utilisant Azure Cosmos DB pour gérer les utilisateurs et les posts. L’objectif est de permettre l’inscription, la connexion et la gestion des données via une API REST construite avec Node.js et Express.
+Before starting the project, make sure you have the following:
+- `Node.js` (version 16 or higher)
+- `npm` or `yarn`
 
-## Prérequis
+## Development Environment
 
-Avant de lancer le projet, assurez-vous de disposer des éléments suivants :
-- `Node.js` (version 16 ou supérieure)
-- `npm` ou `yarn`
+### Deployment Instructions (Development)
 
-## Environnement de Développement
-
-### Instructions de Déploiement (Développement)
-
-1. Installez les dépendances :
+1. Install the dependencies :
 ```bash
 npm install
 ```
 
-2. Lancez le serveur en mode développement :
+2. Start the server in development mode :
 ```bash
 npm run dev
 ```
 
-### Documentation et Points d'entrée
+### Documentation and Entry Points
 
-1. Lancer le projet
-Le serveur de l'application est disponible à l'adresse suivante une fois démarré :
+1. Launch the project
+The application server is available at the following address once started :
 ```bash
 http://localhost:3000
 ```
 
-2. Documentation API avec Swagger
-Swagger est disponible pour visualiser et tester les routes de l'API :
+2. API Documentation with Swagger
+Swagger is available to visualize and test API routes :
 ```bash
 http://localhost:3000/api-docs
 ```
 
-## Environnement de Production
+## Production Environment
 
-### Déploiement sur Azure
+### Deployment on Azure
 
-Le projet a été déployé sur Azure avec les services suivants :
-- `Azure App Service` pour héberger l'API.
-- `Azure Cosmos DB` pour stocker les utilisateurs et les publications.
-- `Azure Blob Storage` pour héberger les fichiers multimédias.
+The project was deployed on Azure with the following services :
+- `Azure App Service` to host the API.
+- `Azure Cosmos DB` to store users and posts.
+- `Azure Blob Storage` to host media files.
 
-### Accès à la Production
-- URL de base :
+### Access to Production
+- Base URL:
 ```bash
 https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net
 ```
 
-- Documentation API Swagger en production :
+- Swagger API documentation in production:
 ```bash
 https://linkuplma-awd7bve4amarhdcn.westeurope-01.azurewebsites.net/api-docs
 ```
 
-## Tests de l'API
+## API Testing
 
-L'API peut être testé :
-1. Avec `Swagger` sur les urls `"/api-docs"`
-2. Sur `Postman` en important notre collection `LinkUp.postman_collection.json` disponible à la racine du projet.
+The API can be tested:
+1. With `Swagger` on `"/api-docs"` urls
+2. On `Postman` by importing our collection `LinkUp.postman_collection.json` available at the root of the project.
 
-## Notes importantes
-- JWT : Les routes protégées nécessitent un token JWT valide. Celui-ci doit être inclus dans les headers sous la forme :
+## Important Notes
+- JWT: Protected routes require a valid JWT token. This must be included in the headers in the form:
 ```json
 {
-  "Authorization": "Bearer <votre-token>"
+  "Authorization": "Bearer <your-token>"
 }
 ```
+
+## Contributors
+- Lou-Anne Gautherie
+- Antonin Montagne
+- Mathieu Goudal
